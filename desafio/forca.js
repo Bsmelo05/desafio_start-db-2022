@@ -1,44 +1,45 @@
 class Forca {
-  letrasChutadas = [];
-  palavra = [];
-  vidas = 6;
-  palavraChave = "abacaxi";
+  myEnums = {
+    PERDEU: "perdeu",
+    AGUARDANDOCHUTE: "aguardando chute",
+    GANHOU: "ganhou",
+  };
+  constructor(palavraSecreta) {
+    this.letrasChutadas = [];
+    this.vidas = 6;
+    this.palavra = new Array(palavraSecreta.length).fill("_");
+    this.palavraSecreta = palavraSecreta.split("");
+  }
   chutar(letra) {
-    const letraPresentePalavra = this.palavraChave.includes(letra);
-    if (this.vidas <= 0) {
-      console.log("Acabou suas vidas!");
-    } else if (letraPresentePalavra) {
-      console.log("Parabens");
-      this.palavra.push(letra);
-    } else {
-      this.vidas--;
-      console.log("Errouu");
+    if (letra.length > 1 || this.letrasChutadas.includes(letra)) {
+      return this.myEnums.AGUARDANDOCHUTE;
     }
-    const letraDigitada = this.letrasChutadas.includes(letra);
-    this.letrasChutadas.push(letra);
+    if (this.palavraSecreta.includes(letra)) {
+      this.letrasChutadas.push(letra);
+      this.palavraSecreta.forEach((element, index) => {
+        if (element === letra) {
+          this.palavra[index] = element;
+        }
+      });
+    } else {
+      this.letrasChutadas.push(letra);
+      this.vidas--;
+    }
   }
 
   buscarEstado() {
-    const myEnums = {
-      PERDEU: "perdeu",
-      AGUARDANDOCHUTE: "aguardando chute",
-      GANHOU: "ganhou",
-    };
-
-    if (this.vidas > 0 && this.palavra.join("") === this.palavraChave) {
-      return myEnums.GANHOU;
-    } else if (this.vidas == 0) {
-      return myEnums.PERDEU;
-    }
-    return myEnums.AGUARDANDOCHUTE;
+    if (this.vidas === 0) return this.myEnums.PERDEU;
+    if (!this.palavra.includes("_")) return this.myEnums.GANHOU;
+    return this.myEnums.AGUARDANDOCHUTE;
   } // Possiveis valores: "perdeu", "aguardando chute" ou "ganhou"
 
   buscarDadosDoJogo() {
     return {
-      letrasChutadas: this.letrasChutadas.join(""),
-      vidas: this.vidas,
-      palavra: this.palavra.join(""),
+      letrasChutadas: this.letrasChutadas, // Deve conter todas as letras chutadas
+      vidas: this.vidas, // Quantidade de vidas restantes
+      palavra: this.palavra, // Deve ser um array com as letras que já foram acertadas ou o valor "_" para as letras não identificadas
     };
   }
 }
+
 module.exports = Forca;
